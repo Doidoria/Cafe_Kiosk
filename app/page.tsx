@@ -1,10 +1,10 @@
-// app/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useCartStore } from "../store/useCartStore";
-import { collection, addDoc, getDocs, query, where, onSnapshot } from "firebase/firestore"; 
-import { db } from "./firebase"; 
+import { collection, addDoc, getDocs, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "./firebase";
+import Image from "next/image";
 
 const categories = [
   { id: 'all', name: '전체' },
@@ -16,19 +16,19 @@ const categories = [
 
 export default function Home() {
   const { cart, addToCart, removeFromCart, updateQuantity, clearCart, totalPrice } = useCartStore();
-  
+
   // ⭐ 파이어베이스에서 불러올 메뉴 상태
   const [menuItems, setMenuItems] = useState<any[]>([]);
 
   const [selectedMenu, setSelectedMenu] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  
+
   const [temp, setTemp] = useState<'HOT' | 'ICE'>('ICE');
   const [size, setSize] = useState<'Regular' | 'Large'>('Regular');
   const [shot, setShot] = useState<number>(0);
-  const [quantity, setQuantity] = useState<number>(1); 
+  const [quantity, setQuantity] = useState<number>(1);
 
-  const [isPaying, setIsPaying] = useState(false); 
+  const [isPaying, setIsPaying] = useState(false);
   const [receipt, setReceipt] = useState<any>(null);
 
   // ⭐ 파이어베이스 메뉴 실시간 연동
@@ -44,10 +44,10 @@ export default function Home() {
 
   const handleMenuClick = (item: any) => {
     if (item.isSoldOut) return; // 품절 메뉴는 클릭 방지
-    
-    setTemp('ICE'); setSize('Regular'); setShot(0); setQuantity(1); 
+
+    setTemp('ICE'); setSize('Regular'); setShot(0); setQuantity(1);
     if (item.category === 'dessert') {
-      setSelectedMenu({ ...item, isDessert: true }); 
+      setSelectedMenu({ ...item, isDessert: true });
       return;
     }
     setSelectedMenu(item);
@@ -56,47 +56,47 @@ export default function Home() {
   const handleAddToCart = () => {
     const optionPrice = selectedMenu.isDessert ? 0 : (size === 'Large' ? 500 : 0) + (shot * 500);
     const finalPrice = selectedMenu.price + optionPrice;
-    const uniqueCartId = selectedMenu.isDessert 
+    const uniqueCartId = selectedMenu.isDessert
       ? `${selectedMenu.id}-default`
       : `${selectedMenu.id}-${temp}-${size}-${shot}`;
 
     addToCart({
-      cartItemId: uniqueCartId, id: selectedMenu.id, name: selectedMenu.name, price: finalPrice, 
+      cartItemId: uniqueCartId, id: selectedMenu.id, name: selectedMenu.name, price: finalPrice,
       quantity: quantity,
       options: selectedMenu.isDessert ? undefined : { temperature: temp, size: size, shot: shot }
     });
-    setSelectedMenu(null); 
+    setSelectedMenu(null);
   };
 
   const handleCheckout = async () => {
-    if(cart.length === 0) return alert('메뉴를 먼저 담아주세요!');
-    setIsPaying(true); 
+    if (cart.length === 0) return alert('메뉴를 먼저 담아주세요!');
+    setIsPaying(true);
     try {
       const now = new Date();
       const dateStr = now.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '-').replace('.', '');
       const q = query(collection(db, "cafe_orders"), where("date", "==", dateStr));
       const querySnapshot = await getDocs(q);
-      const orderNumber = querySnapshot.size + 1; 
+      const orderNumber = querySnapshot.size + 1;
 
       const orderData = {
-        orderNumber, 
+        orderNumber,
         items: cart,
         totalPrice: totalPrice,
-        status: "waiting", 
-        createdAt: now.toISOString(), 
+        status: "waiting",
+        createdAt: now.toISOString(),
         date: dateStr,
-        time: now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) 
+        time: now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       };
 
       await addDoc(collection(db, "cafe_orders"), orderData);
       setReceipt(orderData);
-      clearCart(); 
+      clearCart();
       setTimeout(() => setReceipt(null), 5000);
 
     } catch (error) {
       alert("결제 처리 중 문제가 발생했습니다.");
     } finally {
-      setIsPaying(false); 
+      setIsPaying(false);
     }
   };
 
@@ -104,7 +104,7 @@ export default function Home() {
 
   return (
     <main className="flex w-full h-screen bg-[#FAF5E8] text-[#333] font-sans relative overflow-hidden">
-      
+
       {/* ==============================
           왼쪽: 메뉴판 영역
       ============================== */}
@@ -123,7 +123,7 @@ export default function Home() {
             </button>
           ))}
         </nav>
-        
+
         <div className="flex-1 p-6 overflow-y-auto bg-gray-50/50">
           {/* ⭐ 데이터가 없을 때 표시할 UI */}
           {menuItems.length === 0 ? (
@@ -134,9 +134,9 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredMenuItems.map((item) => (
-                <button 
-                  key={item.id} 
-                  onClick={() => handleMenuClick(item)} 
+                <button
+                  key={item.id}
+                  onClick={() => handleMenuClick(item)}
                   disabled={item.isSoldOut} // 품절 시 클릭 방지
                   className={`bg-white p-5 rounded-2xl shadow-sm transition-all flex flex-col border group relative overflow-hidden
                     ${item.isSoldOut ? 'border-gray-200 opacity-60 cursor-not-allowed grayscale' : 'border-gray-100 hover:shadow-xl hover:-translate-y-1 hover:border-[#D8B868] active:scale-95'}`}
@@ -148,7 +148,19 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="w-full h-36 bg-gray-100 rounded-xl mb-4 flex items-center justify-center text-gray-400 text-sm border border-gray-100">이미지</div>
+                  <div className="w-full h-36 bg-gray-100 rounded-xl mb-4 relative overflow-hidden border border-gray-100 shadow-inner group-hover:border-[#D8B868]/50">
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.name}
+                        fill // 부모 div를 꽉 채우게
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        sizes="(max-w-768px) 100vw, (max-w-1200px) 50vw, 25vw"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300 text-sm font-bold">NO IMAGE</div>
+                    )}
+                  </div>
                   <div className="flex flex-col items-start w-full">
                     <h2 className={`text-xl font-bold tracking-tight ${item.isSoldOut ? 'text-gray-500 line-through' : 'text-gray-800'}`}>{item.name}</h2>
                     <div className="w-full border-t border-gray-100 mt-3 pt-3 flex justify-between items-center">
@@ -226,7 +238,7 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-[#FAF5E8]">{selectedMenu.name} <span className="text-sm text-[#FAF5E8]/80">옵션</span></h3>
               <button onClick={() => setSelectedMenu(null)} className="text-[#D8B868] font-bold text-3xl hover:scale-110">×</button>
             </div>
-            
+
             <div className="p-7 flex flex-col gap-6 bg-gray-50/50">
               {!selectedMenu.isDessert && (
                 <>

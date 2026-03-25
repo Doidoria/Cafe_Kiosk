@@ -16,13 +16,10 @@ const categories = [
 
 export default function Home() {
   const { cart, addToCart, removeFromCart, updateQuantity, clearCart, totalPrice } = useCartStore();
-
-  // ⭐ 파이어베이스에서 불러올 메뉴 상태
   const [menuItems, setMenuItems] = useState<any[]>([]);
-
   const [selectedMenu, setSelectedMenu] = useState<any>(null);
-  const [activeCategory, setActiveCategory] = useState<string>('all');
 
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [temp, setTemp] = useState<'HOT' | 'ICE'>('ICE');
   const [size, setSize] = useState<'Regular' | 'Large'>('Regular');
   const [shot, setShot] = useState<number>(0);
@@ -31,11 +28,9 @@ export default function Home() {
   const [isPaying, setIsPaying] = useState(false);
   const [receipt, setReceipt] = useState<any>(null);
 
-  // ⭐ 파이어베이스 메뉴 실시간 연동
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "cafe_menus"), (snapshot) => {
       const menus = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      // 등록된 시간순 정렬
       menus.sort((a: any, b: any) => a.createdAt - b.createdAt);
       setMenuItems(menus);
     });
@@ -43,7 +38,7 @@ export default function Home() {
   }, []);
 
   const handleMenuClick = (item: any) => {
-    if (item.isSoldOut) return; // 품절 메뉴는 클릭 방지
+    if (item.isSoldOut) return;
 
     setTemp('ICE'); setSize('Regular'); setShot(0); setQuantity(1);
     if (item.category === 'dessert') {
@@ -56,16 +51,24 @@ export default function Home() {
   const handleAddToCart = () => {
     const optionPrice = selectedMenu.isDessert ? 0 : (size === 'Large' ? 500 : 0) + (shot * 500);
     const finalPrice = selectedMenu.price + optionPrice;
-    const uniqueCartId = selectedMenu.isDessert
-      ? `${selectedMenu.id}-default`
+    const uniqueCartId = selectedMenu.isDessert 
+      ? `${selectedMenu.id}-default` 
       : `${selectedMenu.id}-${temp}-${size}-${shot}`;
 
-    addToCart({
-      cartItemId: uniqueCartId, id: selectedMenu.id, name: selectedMenu.name, price: finalPrice,
-      quantity: quantity,
-      options: selectedMenu.isDessert ? undefined : { temperature: temp, size: size, shot: shot }
-    });
-    setSelectedMenu(null);
+    const cartItemData: any = {
+      cartItemId: uniqueCartId, 
+      id: selectedMenu.id, 
+      name: selectedMenu.name, 
+      price: finalPrice, 
+      quantity: quantity
+    };
+
+    if (!selectedMenu.isDessert) {
+      cartItemData.options = { temperature: temp, size: size, shot: shot };
+    }
+
+    addToCart(cartItemData);
+    setSelectedMenu(null); 
   };
 
   const handleCheckout = async () => {
@@ -105,9 +108,7 @@ export default function Home() {
   return (
     <main className="flex w-full h-screen bg-[#FAF5E8] text-[#333] font-sans relative overflow-hidden">
 
-      {/* ==============================
-          왼쪽: 메뉴판 영역
-      ============================== */}
+      {/* 왼쪽: 메뉴판 영역 */}
       <div className="flex-1 flex flex-col h-full">
         <header className="w-full bg-[#224E48] p-5 flex items-center justify-between shadow-md border-b-2 border-[#D8B868]/30">
           <div className="flex items-center gap-3">
@@ -125,7 +126,7 @@ export default function Home() {
         </nav>
 
         <div className="flex-1 p-6 overflow-y-auto bg-gray-50/50">
-          {/* ⭐ 데이터가 없을 때 표시할 UI */}
+          {/* 데이터가 없을 때 표시할 UI */}
           {menuItems.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400">
               <p className="text-xl font-bold mb-2">메뉴를 불러오는 중이거나 등록된 메뉴가 없습니다.</p>
@@ -153,7 +154,7 @@ export default function Home() {
                       <Image
                         src={item.imageUrl}
                         alt={item.name}
-                        fill // 부모 div를 꽉 채우게
+                        fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                         sizes="(max-w-768px) 100vw, (max-w-1200px) 50vw, 25vw"
                       />

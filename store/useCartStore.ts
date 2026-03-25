@@ -1,6 +1,4 @@
-// store/useCartStore.ts
 import { create } from 'zustand';
-
 export interface CartItem {
   cartItemId: string;
   id: number;
@@ -19,7 +17,7 @@ interface CartState {
   totalPrice: number;
   addToCart: (item: CartItem) => void;
   removeFromCart: (cartItemId: string) => void;
-  updateQuantity: (cartItemId: string, delta: number) => void; // ⭐ 장바구니 수량 조절 함수 추가
+  updateQuantity: (cartItemId: string, delta: number) => void;
   clearCart: () => void;
 }
 
@@ -53,12 +51,10 @@ export const useCartStore = create<CartState>((set) => ({
       };
     }),
 
-  // ⭐ 장바구니 안에서 수량을 조절하는 로직
   updateQuantity: (cartItemId, delta) =>
     set((state) => {
       const newCart = state.cart.map((item) => {
         if (item.cartItemId === cartItemId) {
-          // 최소 1개는 유지하도록 Math.max 사용
           const newQuantity = Math.max(1, item.quantity + delta);
           return { ...item, quantity: newQuantity };
         }

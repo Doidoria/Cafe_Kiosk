@@ -45,16 +45,18 @@
 1. **디저트 메뉴 결제 시 파이어베이스 `undefined` 에러 해결**
    * **문제:** 옵션이 없는 디저트 메뉴를 장바구니에 담을 때 `options: undefined` 값이 파이어베이스로 전송되면서 결제 에러 발생.
    * **해결:** `options` 객체를 선택적으로 추가하도록 로직을 수정하여, 디저트 메뉴는 옵션 프로퍼티 자체가 생성되지 않도록 분기 처리함.
+     
 2. **무한 스크롤 & DB 용량 관리 고민**
    * **문제:** 주문 데이터가 영구적으로 쌓일 경우 파이어베이스 무료 제공량을 초과할 위험 인지.
    * **해결:** 어드민 페이지에 [영업 마감] 버튼을 구현하여, 클릭 시 당일 데이터를 일괄 삭제(`deleteDoc`)하도록 설계하여 유지보수성 확보.
+     
 3. **이미지 렌더링 최적화**
    * **문제:** 파이어베이스 스토리지의 원본 이미지를 그대로 띄울 경우 로딩 지연 발생.
    * **해결:** Next.js의 `next/image` 컴포넌트를 적용하고 `next.config.ts`에 외부 도메인을 허용하여 이미지 최적화 및 레이아웃 시프트를 방지함.
 
 ---
 
-## ⚙️ 로컬 실행 방법 (Getting Started)
+## 로컬 실행 방법 (Getting Started)
 
 ```bash
 # 1. 패키지 설치
@@ -65,3 +67,13 @@ npm install
 
 # 3. 개발 서버 실행
 npm run dev
+```
+
+## 로컬 키오스크 실제 작동 이미지
+
+<img width="2160" height="3840" alt="cafe-kiosk vercel app_" src="https://github.com/user-attachments/assets/7302550c-a86a-44ad-9ad7-a99a2cc5b6bf" />
+<img width="2160" height="3840" alt="cafe-kiosk vercel app_ (1)" src="https://github.com/user-attachments/assets/68363535-edf7-4df6-ac24-97f3292cb4e0" />
+<img width="2160" height="3840" alt="cafe-kiosk vercel app_admin (1)" src="https://github.com/user-attachments/assets/4ee3cdab-2cad-4f4e-944b-340520bcaa02" />
+<img width="2160" height="3840" alt="cafe-kiosk vercel app_admin (2)" src="https://github.com/user-attachments/assets/1fb363db-9286-4f1b-a1c3-999d24d2132f" />
+<img width="2160" height="3840" alt="cafe-kiosk vercel app_admin" src="https://github.com/user-attachments/assets/11280227-2b36-429f-88e9-71be65052177" />
+

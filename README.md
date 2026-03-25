@@ -10,7 +10,7 @@
 > **O2O(Online to Offline) 카페 키오스크 & 어드민 시스템입니다.** <br/>
 > 고객이 키오스크에서 결제하면 사장님의 어드민 화면에 실시간으로 주문이 연동되며, 메뉴 관리와 매출 통계까지 하나의 서비스에서 처리할 수 있습니다.
 
-**라이브 데모 웹사이트:** (cafe-kiosk.vercel.app)
+**라이브 데모 웹사이트:** [cafe-kiosk.vercel.app)](https://cafe-kiosk.vercel.app/)
 
 ---
 
@@ -30,7 +30,7 @@
 
 ---
 
-## 🛠 기술 스택 및 도입 배경
+## 기술 스택 및 도입 배경
 
 * **Framework:** `Next.js 14` (App Router) - 직관적인 라우팅과 빠른 렌더링을 위해 도입.
 * **Language:** `TypeScript` - 런타임 에러 방지 및 주문/메뉴 데이터 인터페이스 규격화를 위해 도입.
